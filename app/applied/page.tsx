@@ -19,14 +19,24 @@ export default function AppliedPage() {
   const grandTotal = useMemo(() => applications.reduce((total, application) => total + application.total, 0), [applications]);
 
   return (
-    <main className="min-h-screen bg-background">
-      <Navbar />
+    <main className="min-h-screen my-10 bg-background">
       <div className="mx-auto w-full max-w-[1440px] px-4 py-10 sm:px-6 lg:px-10 lg:py-16">
         <div className="flex flex-col gap-7 border-b border-border/70 pb-10 sm:flex-row sm:items-end sm:justify-between">
-          <div><p className="text-sm font-medium text-primary">Applied</p><h1 className="mt-2 text-3xl font-semibold tracking-tight">Application tracker</h1><p className="mt-2 text-sm text-muted-foreground">Monitor every bid and the amount currently blocked.</p></div>
+          <div>
+            <p className="text-sm font-medium text-primary">Applied</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight">Application tracker</h1>
+            <p className="mt-2 text-sm text-muted-foreground">Monitor every bid and the amount currently blocked.</p>
+          </div>
+        </div>
+        {loading ? <ApplicationSummarySkeleton /> : <div className="mt-10 grid gap-4 sm:grid-cols-3">
+          <Summary label="Total applications" value={String(applications.length).padStart(2, "0")} />
+          <Summary label="Total blocked" value={formatCurrency(grandTotal)} primary />
+          <Summary label="Tracked lots" value={String(applications.reduce((sum, application) => sum + application.lots, 0)).padStart(2, "0")} />
+        </div>
+        }
+        <div className="flex justify-end my-5">
           <ApplicationSheet editingApplication={editingApplication} onEditClose={() => setEditingApplication(null)} onAdd={addApplication} onUpdate={updateApplication} />
         </div>
-        {loading ? <ApplicationSummarySkeleton /> : <div className="mt-10 grid gap-4 sm:grid-cols-3"><Summary label="Total applications" value={String(applications.length).padStart(2, "0")} /><Summary label="Total blocked" value={formatCurrency(grandTotal)} primary /><Summary label="Tracked lots" value={String(applications.reduce((sum, application) => sum + application.lots, 0)).padStart(2, "0")} /></div>}
         <section className="mt-16">
           <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-lg font-semibold">All applications</h2>
@@ -42,5 +52,5 @@ export default function AppliedPage() {
 }
 
 function Summary({ label, value, primary }: { label: string; value: string; primary?: boolean }) {
-  return <div className={cn("border border-border/70 bg-card p-5 sm:p-6", primary && "bg-primary/40 text-primary-foreground")}><p className={cn("text-sm", primary ? "text-primary-foreground/75" : "text-muted-foreground")}>{label}</p><p className="mt-3 text-2xl font-semibold">{value}</p></div>;
+  return <div className={cn("border border-border/70 bg-card p-5 sm:p-6", primary && "bg-primary/10 border-primary/60 text-primary-foreground")}><p className={cn("text-sm", primary ? "text-primary-foreground/75" : "text-muted-foreground")}>{label}</p><p className="mt-3 text-2xl font-semibold">{value}</p></div>;
 }

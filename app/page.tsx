@@ -2,13 +2,12 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { Navbar } from "@/components/Navbar";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-background">
-      <Navbar />
       <section className="relative isolate flex min-h-[calc(100svh-4rem)] w-full items-center justify-center overflow-hidden px-5 py-16 sm:px-8">
         <DotGrid />
         <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center text-center">
@@ -19,15 +18,14 @@ export default function HomePage() {
           <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
             Keep bids, lots, dates, and blocked amounts together in one private workspace.
           </p>
+
           <Link
             href="/applied"
-            className={cn(
-              buttonVariants({ size: "lg" }),
-              "mt-8 h-12 w-full justify-center px-7 text-base shadow-lg shadow-primary/10 sm:w-auto"
-            )}
           >
-            Track an application
-            <ArrowRight className="size-4" aria-hidden="true" />
+            <Button className="my-5" size={"lg"}>
+              Track an application
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </Button>
           </Link>
         </div>
       </section>

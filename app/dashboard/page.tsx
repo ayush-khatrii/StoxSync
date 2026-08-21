@@ -39,7 +39,6 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-background">
-      <Navbar />
       <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 lg:px-10 lg:py-16">
         <div className="border-b border-border/70 pb-8"><p className="text-sm font-medium text-primary">Account</p><h1 className="mt-2 text-3xl font-semibold tracking-tight">Workspace settings</h1><p className="mt-3 text-sm leading-6 text-muted-foreground">Change the six-digit passcode used to unlock this private IPO tracker.</p></div>
         <section className="mt-10 max-w-xl border border-border/70 bg-card p-5 sm:p-7">

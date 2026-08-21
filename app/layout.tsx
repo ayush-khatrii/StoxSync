@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/components/auth-provider";
 import { AuthGate } from "@/components/AuthGate";
 import { QueryProvider } from "@/components/query-provider";
+import { Navbar } from '../components/Navbar';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -32,7 +33,20 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
     >
       <body className="min-h-full">
-        <ThemeProvider><QueryProvider><AuthProvider><AuthGate>{children}</AuthGate></AuthProvider></QueryProvider></ThemeProvider>
+        <ThemeProvider>
+          <QueryProvider>
+            <AuthProvider>
+              <AuthGate>
+                <main>
+                  <div className="md:mb-0 mb-20">
+                    <Navbar />
+                  </div>
+                  {children}
+                </main>
+              </AuthGate>
+            </AuthProvider>
+          </QueryProvider>
+          <figcaption></figcaption></ThemeProvider>
       </body>
     </html>
   );
