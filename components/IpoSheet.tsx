@@ -17,7 +17,6 @@ export function IpoSheet({ onAdd, onUpdate, editingIpo, onEditClose }: { onAdd: 
   const [offerEnd, setOfferEnd] = useState("");
   const [offerPrice, setOfferPrice] = useState("");
   const [lotSize, setLotSize] = useState("");
-  const [issueSize, setIssueSize] = useState("");
 
   useEffect(() => {
     if (!editingIpo) return;
@@ -26,7 +25,6 @@ export function IpoSheet({ onAdd, onUpdate, editingIpo, onEditClose }: { onAdd: 
     setOfferEnd(editingIpo.offerEnd ?? "");
     setOfferPrice(editingIpo.offerPrice);
     setLotSize(String(editingIpo.lotSize));
-    setIssueSize(editingIpo.issueSize);
     setOpen(true);
   }, [editingIpo]);
 
@@ -34,7 +32,7 @@ export function IpoSheet({ onAdd, onUpdate, editingIpo, onEditClose }: { onAdd: 
     event.preventDefault();
     const name = company.trim();
     const prices = parsePrices(offerPrice);
-    if (!name || !offerStart || !offerEnd || !prices.length || !numberValue(lotSize) || !issueSize.trim()) return;
+    if (!name || !offerStart || !offerEnd || !prices.length || !numberValue(lotSize)) return;
 
     const nextIpo = {
       id: editingIpo?.id ?? `ipo-${Date.now()}`,
@@ -47,7 +45,6 @@ export function IpoSheet({ onAdd, onUpdate, editingIpo, onEditClose }: { onAdd: 
       offerPrice: offerPrice.trim(),
       cutOffPrice: Math.max(...prices),
       lotSize: numberValue(lotSize),
-      issueSize: issueSize.trim(),
     } satisfies Ipo;
 
     if (editingIpo && onUpdate) onUpdate(nextIpo);
@@ -59,7 +56,6 @@ export function IpoSheet({ onAdd, onUpdate, editingIpo, onEditClose }: { onAdd: 
     setOfferEnd("");
     setOfferPrice("");
     setLotSize("");
-    setIssueSize("");
   }
 
   function handleClose() {
@@ -84,7 +80,6 @@ export function IpoSheet({ onAdd, onUpdate, editingIpo, onEditClose }: { onAdd: 
               <Field id="ipo-price" label="Offer price" placeholder="190-201" value={offerPrice} onChange={setOfferPrice} />
               <Field id="ipo-lot" label="Lot size" placeholder="74" value={lotSize} onChange={setLotSize} type="number" min="1" />
             </div>
-            <Field id="ipo-size" label="Issue size" placeholder="₹1,700 Cr" value={issueSize} onChange={setIssueSize} />
           </div>
 
           <div className="mt-auto border-y border-border py-5 text-sm text-muted-foreground">Offer price and lot size are used later to calculate each application total.</div>

@@ -1,14 +1,12 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { Check, Plus, UserRound } from "lucide-react";
+import { Check, Plus } from "lucide-react";
 
-import { PANS } from "@/constants";
 import { DatePicker, formatDateRange } from "@/components/DatePicker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 export type ApplicationEntry = {
@@ -38,11 +36,10 @@ export function ApplicationSheet({ onAdd, onUpdate, editingApplication, onEditCl
   const [lotSize, setLotSize] = useState("");
   const [lots, setLots] = useState("1");
   const [applicationDate, setApplicationDate] = useState(today());
-  const [applicantId, setApplicantId] = useState(PANS[0]?.id ?? "");
+  const [applicant, setApplicant] = useState("");
 
   const cutOffPrice = parsePrice(offerPrice);
   const total = cutOffPrice * numberValue(lotSize) * numberValue(lots);
-  const applicant = PANS.find((pan) => pan.id === applicantId);
 
   useEffect(() => {
     if (!editingApplication) return;
@@ -53,22 +50,21 @@ export function ApplicationSheet({ onAdd, onUpdate, editingApplication, onEditCl
     setLotSize(String(editingApplication.lotSize));
     setLots(String(editingApplication.lots));
     setApplicationDate(editingApplication.applicationDate);
-    const existingApplicant = PANS.find((pan) => pan.name === editingApplication.applicant);
-    setApplicantId(existingApplicant?.id ?? PANS[0]?.id ?? "");
+    setApplicant(editingApplication.applicant);
     setOpen(true);
   }, [editingApplication]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const name = company.trim();
-    if (!name || !offerStart || !offerEnd || !offerPrice.trim() || !numberValue(lotSize) || !applicant || !applicationDate || total <= 0) return;
+    if (!name || !offerStart || !offerEnd || !offerPrice.trim() || !numberValue(lotSize) || !applicant.trim() || !applicationDate || total <= 0) return;
 
     const nextApplication = {
       id: `application-${Date.now()}`,
       company: name,
       symbol: symbolFor(name),
       initials: initialsFor(name),
-      applicant: applicant.name,
+      applicant: applicant.trim(),
       applicationDate,
       offerDate: formatDateRange(offerStart, offerEnd),
       offerStart,
@@ -101,7 +97,7 @@ export function ApplicationSheet({ onAdd, onUpdate, editingApplication, onEditCl
     setLotSize("");
     setLots("1");
     setApplicationDate(today());
-    setApplicantId(PANS[0]?.id ?? "");
+    setApplicant("");
   }
 
   return (
@@ -128,7 +124,7 @@ export function ApplicationSheet({ onAdd, onUpdate, editingApplication, onEditCl
             <div className="space-y-2"><Label>Application date</Label><DatePicker value={applicationDate} onChange={setApplicationDate} /></div>
           </div>
 
-          <div className="space-y-2"><Label htmlFor="applicant">Applicant</Label><Select value={applicantId} onValueChange={(value) => setApplicantId(value ?? "")}><SelectTrigger id="applicant" className="h-10 w-full"><UserRound className="size-4 text-muted-foreground" aria-hidden="true" /><SelectValue placeholder="Select applicant" /></SelectTrigger><SelectContent>{PANS.map((pan) => <SelectItem key={pan.id} value={pan.id}>{pan.name} · {pan.relation}</SelectItem>)}</SelectContent></Select></div>
+          <Field id="applicant" label="Applicant name" placeholder="Enter applicant name" value={applicant} onChange={setApplicant} />
 
           <div className="mt-auto border-y border-border py-5"><div className="flex items-center justify-between gap-4 text-sm"><span className="text-muted-foreground">Total application</span><strong className="text-xl">{formatCurrency(total)}</strong></div><p className="mt-2 text-xs text-muted-foreground">{numberValue(lots) || 0} lot{numberValue(lots) === 1 ? "" : "s"} · {numberValue(lotSize) || 0} shares per lot · ₹{cutOffPrice || 0} cut-off</p></div>
           <SheetFooter><Button type="submit" className="h-10 w-full"><Check className="size-4" aria-hidden="true" />Add to applications</Button></SheetFooter>

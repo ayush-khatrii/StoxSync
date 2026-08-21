@@ -27,7 +27,6 @@ export function IpoList({ ipos, onEdit, onDelete }: { ipos: Ipo[]; onEdit?: (ipo
           <TableHead className="h-9 px-3 text-[11px] uppercase tracking-wider">Offer dates</TableHead>
           <TableHead className="h-9 px-3 text-[11px] uppercase tracking-wider">Offer price</TableHead>
           <TableHead className="h-9 px-3 text-[11px] uppercase tracking-wider">Lot size</TableHead>
-          <TableHead className="h-9 px-3 text-[11px] uppercase tracking-wider">Issue size</TableHead>
           <TableHead className="h-9 px-3 text-right text-[11px] uppercase tracking-wider">{onEdit && onDelete ? "Actions" : "Track"}</TableHead>
         </TableRow>
       </TableHeader>
@@ -38,7 +37,6 @@ export function IpoList({ ipos, onEdit, onDelete }: { ipos: Ipo[]; onEdit?: (ipo
             <TableCell className="whitespace-nowrap px-3 py-3 text-muted-foreground"><span className="inline-flex items-center gap-1.5"><CalendarDays className="size-3.5" aria-hidden="true" />{ipo.offerDate}</span></TableCell>
             <TableCell className="whitespace-nowrap px-3 py-3 font-medium">₹{ipo.offerPrice}</TableCell>
             <TableCell className="whitespace-nowrap px-3 py-3"><span className="inline-flex items-center gap-1.5"><Layers3 className="size-3.5 text-muted-foreground" aria-hidden="true" />{ipo.lotSize} shares</span></TableCell>
-            <TableCell className="whitespace-nowrap px-3 py-3 font-semibold">{ipo.issueSize}</TableCell>
             <TableCell className="px-3 py-3 text-right">{onEdit && onDelete ? <RowActions itemLabel={ipo.company} onEdit={() => onEdit(ipo)} onDelete={() => onDelete(ipo)} /> : <Link href="/applied" className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))} aria-label={`Track ${ipo.company}`}><ArrowUpRight className="size-4" aria-hidden="true" /></Link>}</TableCell>
           </TableRow>
         ))}

@@ -9,10 +9,12 @@ import { ApplicationList, formatCurrency } from "@/components/ApplicationList";
 import { Navbar } from "@/components/Navbar";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useStoredList } from "@/components/use-stored-list";
+import { useApplications } from "@/components/use-applications";
+import { ApplicationSummarySkeleton, ApplicationTableSkeleton } from "@/components/DataSkeletons";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AppliedPage() {
-  const [applications, setApplications] = useStoredList<ApplicationEntry>("stoxsync-applications", []);
+  const { applications, addApplication, updateApplication, deleteApplication, loading, error } = useApplications();
   const [editingApplication, setEditingApplication] = useState<ApplicationEntry | null>(null);
   const grandTotal = useMemo(() => applications.reduce((total, application) => total + application.total, 0), [applications]);
 
@@ -22,10 +24,17 @@ export default function AppliedPage() {
       <div className="mx-auto w-full max-w-[1440px] px-4 py-10 sm:px-6 lg:px-10 lg:py-16">
         <div className="flex flex-col gap-7 border-b border-border/70 pb-10 sm:flex-row sm:items-end sm:justify-between">
           <div><p className="text-sm font-medium text-primary">Applied</p><h1 className="mt-2 text-3xl font-semibold tracking-tight">Application tracker</h1><p className="mt-2 text-sm text-muted-foreground">Monitor every bid and the amount currently blocked.</p></div>
-          <ApplicationSheet editingApplication={editingApplication} onEditClose={() => setEditingApplication(null)} onAdd={(application) => setApplications((current) => [application, ...current])} onUpdate={(application) => setApplications((current) => current.map((item) => item.id === application.id ? application : item))} />
+          <ApplicationSheet editingApplication={editingApplication} onEditClose={() => setEditingApplication(null)} onAdd={addApplication} onUpdate={updateApplication} />
         </div>
-        <div className="mt-10 grid gap-4 sm:grid-cols-3"><Summary label="Total applications" value={String(applications.length).padStart(2, "0")} /><Summary label="Total blocked" value={formatCurrency(grandTotal)} primary /><Summary label="Tracked lots" value={String(applications.reduce((sum, application) => sum + application.lots, 0)).padStart(2, "0")} /></div>
-        <section className="mt-16"><div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"><h2 className="text-lg font-semibold">All applications</h2><span className="text-sm text-muted-foreground">Grand total <strong className="text-foreground">{formatCurrency(grandTotal)}</strong></span></div><ApplicationList applications={applications} onEdit={setEditingApplication} onDelete={(application) => setApplications((current) => current.filter((item) => item.id !== application.id))} /></section>
+        {loading ? <ApplicationSummarySkeleton /> : <div className="mt-10 grid gap-4 sm:grid-cols-3"><Summary label="Total applications" value={String(applications.length).padStart(2, "0")} /><Summary label="Total blocked" value={formatCurrency(grandTotal)} primary /><Summary label="Tracked lots" value={String(applications.reduce((sum, application) => sum + application.lots, 0)).padStart(2, "0")} /></div>}
+        <section className="mt-16">
+          <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-lg font-semibold">All applications</h2>
+            {loading ? <Skeleton className="h-4 w-36" /> : <span className="text-sm text-muted-foreground">Grand total <strong className="text-foreground">{formatCurrency(grandTotal)}</strong></span>}
+          </div>
+          {error && <p className="mb-4 text-sm text-destructive">{error}</p>}
+          {loading ? <ApplicationTableSkeleton /> : <ApplicationList applications={applications} onEdit={setEditingApplication} onDelete={deleteApplication} />}
+        </section>
         <div className="mt-16 border-t border-border/70 pt-6 text-sm text-muted-foreground"><Link href="/all-ipos" className={cn(buttonVariants({ variant: "link", size: "sm" }), "px-0")}>Review IPO pipeline <ArrowUpRight className="size-4" aria-hidden="true" /></Link></div>
       </div>
     </main>

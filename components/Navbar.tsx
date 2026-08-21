@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, Home, ListChecks } from "lucide-react";
+import { BarChart3, Home, ListChecks, LockKeyhole, Menu } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const navItems = [
   { label: "Home", href: "/", icon: Home },
@@ -32,7 +34,7 @@ export function Navbar() {
           </span>
         </Link>
 
-        <nav className="hidden items-center rounded-lg border bg-muted/30 p-1 md:flex">
+        <nav className="hidden items-center gap-1 md:flex">
           {navItems.map((item) => {
             const Icon = item.icon;
 
@@ -44,9 +46,9 @@ export function Navbar() {
                 key={item.label}
                 href={item.href}
                 className={cn(
-                  "flex h-9 items-center gap-2 rounded-md px-3 text-sm font-medium text-muted-foreground transition hover:bg-accent hover:text-accent-foreground",
+                  "relative flex h-10 items-center gap-2 px-3 text-sm font-medium text-muted-foreground transition hover:text-foreground",
                   active &&
-                    "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:text-primary-foreground"
+                    "text-primary after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:bg-primary"
                 )}
               >
                 <Icon className="size-4" aria-hidden="true" />
@@ -56,36 +58,37 @@ export function Navbar() {
           })}
         </nav>
 
-        <div className="hidden text-sm font-medium text-muted-foreground sm:block">
-          IPO Tracker
+        <div className="hidden text-sm font-medium text-muted-foreground md:block">
+          <Link href="/dashboard" className="inline-flex items-center gap-2 transition hover:text-foreground"><LockKeyhole className="size-4" />Account</Link>
+        </div>
+
+        <div className="md:hidden">
+          <Sheet>
+          <SheetTrigger render={<Button variant="ghost" size="icon" aria-label="Open navigation"><Menu className="size-5" /></Button>} />
+          <SheetContent side="right" className="w-[min(86vw,360px)] sm:max-w-sm">
+            <SheetHeader className="pr-10"><SheetTitle>Stoxsync</SheetTitle><SheetDescription>IPO tracker navigation</SheetDescription></SheetHeader>
+            <nav className="mt-5 flex flex-col gap-1">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+
+                return (
+                  <SheetClose key={item.label} render={<Link href={item.href} className={cn("flex h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium text-muted-foreground transition hover:bg-accent hover:text-accent-foreground", active && "bg-primary/10 text-primary")} />}>
+                    <Icon className="size-4" aria-hidden="true" />
+                    {item.label}
+                  </SheetClose>
+                );
+              })}
+              <div className="my-3 border-t border-border/70" />
+              <SheetClose render={<Link href="/dashboard" className={cn("flex h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium text-muted-foreground transition hover:bg-accent hover:text-accent-foreground", pathname.startsWith("/dashboard") && "bg-primary/10 text-primary")} />}>
+                <LockKeyhole className="size-4" aria-hidden="true" />
+                Account
+              </SheetClose>
+            </nav>
+          </SheetContent>
+          </Sheet>
         </div>
       </div>
-
-      <nav className="border-t px-4 py-2 md:hidden">
-        <div className="mx-auto grid max-w-[1440px] grid-cols-3 gap-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-
-            const active =
-              item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-
-            return (
-              <Link
-                key={item.label}
-                href={item.href}
-                className={cn(
-                  "flex h-10 items-center justify-center gap-1.5 rounded-lg text-xs font-medium text-muted-foreground transition hover:bg-accent hover:text-accent-foreground",
-                  active &&
-                    "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
-                )}
-              >
-                <Icon className="size-3.5" aria-hidden="true" />
-                <span className="truncate">{item.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
     </header>
   );
 }

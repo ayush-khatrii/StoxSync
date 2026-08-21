@@ -1,26 +1,88 @@
 "use client";
 
 import { useState } from "react";
-import { useStoredList } from "@/components/use-stored-list";
-import { IpoList } from "@/components/IpoList";
-import { IpoSheet } from "@/components/IpoSheet";
+import { useQuery } from "@tanstack/react-query";
+
 import { Navbar } from "@/components/Navbar";
-import type { Ipo } from "@/constants";
+import { IpoCategoryTabs } from "@/components/market-ipos/IpoCategoryTabs";
+import { IpoPagination } from "@/components/market-ipos/IpoPagination";
+import { MarketIpoList } from "@/components/market-ipos/MarketIpoList";
+import { MarketIpoListSkeleton } from "@/components/market-ipos/MarketIpoListSkeleton";
+import { IPO_CATEGORY_LABELS, type IpoCategory, type PaginatedIpoResponse } from "@/lib/market-ipos";
+
+const PAGE_SIZE = 10;
 
 export default function AllIposPage() {
-  const [ipos, setIpos] = useStoredList<Ipo>("stoxsync-ipos", []);
-  const [editingIpo, setEditingIpo] = useState<Ipo | null>(null);
+  const [category, setCategory] = useState<IpoCategory>("active");
+  const [page, setPage] = useState(1);
+
+  const { data, error, isPending, isFetching } = useQuery({
+    queryKey: ["market-ipos", category, page],
+    queryFn: () => fetchIpos(category, page),
+  });
+
+  function changeCategory(nextCategory: IpoCategory) {
+    setCategory(nextCategory);
+    setPage(1);
+  }
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen overflow-x-hidden bg-background">
       <Navbar />
-      <div className="mx-auto w-full max-w-[1440px] px-4 py-10 sm:px-6 lg:px-10 lg:py-16">
-        <div className="flex flex-col gap-7 border-b border-border/70 pb-10 sm:flex-row sm:items-end sm:justify-between">
-          <div><p className="text-sm font-medium text-primary">All IPOs</p><h1 className="mt-3 text-3xl font-semibold tracking-tight">Your IPO list</h1><p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">Add the essential details you have available. This list does not depend on an API response.</p></div>
-          <IpoSheet editingIpo={editingIpo} onEditClose={() => setEditingIpo(null)} onAdd={(ipo) => setIpos((current) => [ipo, ...current])} onUpdate={(ipo) => setIpos((current) => current.map((item) => item.id === ipo.id ? ipo : item))} />
-        </div>
-        <section className="mt-14"><div className="mb-8 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between"><h2 className="text-lg font-semibold">{ipos.length} IPO{ipos.length === 1 ? "" : "s"} tracked</h2><span className="text-sm text-muted-foreground">Company, date, price, lot, and issue size</span></div><IpoList ipos={ipos} onEdit={setEditingIpo} onDelete={(ipo) => setIpos((current) => current.filter((item) => item.id !== ipo.id))} /></section>
+      <div className="mx-auto w-full max-w-[1200px] px-5 py-8 sm:px-7 sm:py-12 lg:px-10">
+        <header className="border-b border-border/70 pb-7">
+          <p className="text-xs font-medium uppercase text-primary">IPO market</p>
+          <h1 className="mt-2 text-2xl font-semibold tracking-normal sm:text-3xl">All IPOs</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Browse current and historical issues by status.</p>
+        </header>
+
+        <section className="mt-7">
+          <IpoCategoryTabs activeCategory={category} onChange={changeCategory} />
+
+          <div className="flex min-h-12 items-center justify-between gap-3 py-4">
+            <div>
+              <h2 className="text-sm font-semibold">{IPO_CATEGORY_LABELS[category]} IPOs</h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {isPending ? "Loading records" : `${data?.total ?? 0} record${data?.total === 1 ? "" : "s"}`}
+              </p>
+            </div>
+            {isFetching && !isPending && <span className="text-xs text-muted-foreground">Refreshing...</span>}
+          </div>
+
+          {error && <div className="border-y border-destructive/40 py-4 text-sm text-destructive">{error.message}</div>}
+          {isPending ? (
+            <MarketIpoListSkeleton />
+          ) : (
+            <MarketIpoList
+              items={data?.items ?? []}
+              category={category}
+              startIndex={((data?.page ?? page) - 1) * PAGE_SIZE}
+            />
+          )}
+
+          {!isPending && !error && data && (
+            <>
+              <p className="mt-5 text-center text-xs text-muted-foreground">
+                Page {data.page} of {data.totalPages}
+              </p>
+              <IpoPagination page={data.page} totalPages={data.totalPages} onChange={setPage} />
+            </>
+          )}
+        </section>
       </div>
     </main>
   );
+}
+
+async function fetchIpos(category: IpoCategory, page: number) {
+  const params = new URLSearchParams({
+    category,
+    page: String(page),
+    limit: String(PAGE_SIZE),
+  });
+  const response = await fetch(`/api/market/ipos?${params.toString()}`);
+  const body = await response.json().catch(() => ({})) as PaginatedIpoResponse & { error?: string };
+
+  if (!response.ok) throw new Error(body.error || "Unable to load IPOs.");
+  return body;
 }

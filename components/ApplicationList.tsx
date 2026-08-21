@@ -43,37 +43,37 @@ export function ApplicationList({ applications, onEdit, onDelete }: { applicatio
 
   return (
     <Table className="min-w-[980px] text-xs">
-        <caption className="sr-only">Tracked IPO applications and blocked amounts</caption>
-        <TableHeader>
-          <TableRow className="bg-muted/30 hover:bg-muted/30">
-            <TableHead className="h-9 px-3 text-[11px] uppercase tracking-wider">IPO</TableHead>
-            <TableHead className="h-9 px-3 text-[11px] uppercase tracking-wider">Offer dates</TableHead>
-            <TableHead className="h-9 px-3 text-[11px] uppercase tracking-wider">Offer price</TableHead>
-            <TableHead className="h-9 px-3 text-[11px] uppercase tracking-wider">Lot size</TableHead>
-            <TableHead className="h-9 px-3 text-[11px] uppercase tracking-wider">Bid lots</TableHead>
-            <TableHead className="h-9 px-3 text-[11px] uppercase tracking-wider">Applied on</TableHead>
-            <TableHead className="h-9 px-3 text-[11px] uppercase tracking-wider">Applicant</TableHead>
-            <TableHead className="h-9 px-3 text-right text-[11px] uppercase tracking-wider">Total</TableHead>
-            <TableHead className="h-9 px-3 text-right text-[11px] uppercase tracking-wider">Status</TableHead>
-            {onEdit && onDelete && <TableHead className="h-9 px-3 text-right text-[11px] uppercase tracking-wider">Actions</TableHead>}
+      <caption className="sr-only">Tracked IPO applications and blocked amounts</caption>
+      <TableHeader>
+        <TableRow className="bg-muted/30 hover:bg-muted/30">
+          <TableHead className="h-9 px-3 text-[11px] uppercase tracking-wider">IPO</TableHead>
+          <TableHead className="h-9 px-3 text-[11px] uppercase tracking-wider">Offer dates</TableHead>
+          <TableHead className="h-9 px-3 text-[11px] uppercase tracking-wider">Offer price</TableHead>
+          <TableHead className="h-9 px-3 text-[11px] uppercase tracking-wider">Lot size</TableHead>
+          <TableHead className="h-9 px-3 text-[11px] uppercase tracking-wider">Bid lots</TableHead>
+          <TableHead className="h-9 px-3 text-[11px] uppercase tracking-wider">Applied on</TableHead>
+          <TableHead className="h-9 px-3 text-[11px] uppercase tracking-wider">Applicant</TableHead>
+          <TableHead className="h-9 px-3 text-right text-[11px] uppercase tracking-wider">Total</TableHead>
+          <TableHead className="h-9 px-3 text-right text-[11px] uppercase tracking-wider">Status</TableHead>
+          {onEdit && onDelete && <TableHead className="h-9 px-3 text-right text-[11px] uppercase tracking-wider">Actions</TableHead>}
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {applications.map((application) => (
+          <TableRow key={application.id} className="border-border/70 hover:bg-muted/20">
+            <TableCell className="px-3 py-3"><div className="flex items-center gap-2.5"><span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-[11px] font-semibold">{application.initials}</span><div className="min-w-0"><p className="max-w-[220px] truncate font-medium">{application.company}</p><p className="text-[11px] text-muted-foreground">{application.symbol}</p></div></div></TableCell>
+            <TableCell className="whitespace-nowrap px-3 py-3 text-muted-foreground">{application.offerDate || "—"}</TableCell>
+            <TableCell className="whitespace-nowrap px-3 py-3 font-medium">₹{application.offerPrice || application.cutOffPrice}</TableCell>
+            <TableCell className="whitespace-nowrap px-3 py-3">{application.lotSize} shares</TableCell>
+            <TableCell className="px-3 py-3">{application.lots}</TableCell>
+            <TableCell className="whitespace-nowrap px-3 py-3 text-muted-foreground"><span className="inline-flex items-center gap-1.5"><CalendarDays className="size-3.5" aria-hidden="true" />{formatDate(application.applicationDate)}</span></TableCell>
+            <TableCell className="whitespace-nowrap px-3 py-3">{application.applicant}</TableCell>
+            <TableCell className="whitespace-nowrap px-3 py-3 text-right font-semibold">{formatCurrency(application.total)}</TableCell>
+            <TableCell className="px-3 py-3 text-right"><span className={cn("font-medium", application.status === "Tracked" ? "text-primary" : "text-muted-foreground")}>{application.status}</span></TableCell>
+            {onEdit && onDelete && <TableCell className="px-3 py-3"><RowActions itemLabel={application.company} onEdit={() => onEdit(application)} onDelete={() => onDelete(application)} /></TableCell>}
           </TableRow>
-        </TableHeader>
-        <TableBody>
-          {applications.map((application) => (
-            <TableRow key={application.id} className="border-border/70 hover:bg-muted/20">
-              <TableCell className="px-3 py-3"><div className="flex items-center gap-2.5"><span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-[11px] font-semibold">{application.initials}</span><div className="min-w-0"><p className="max-w-[220px] truncate font-medium">{application.company}</p><p className="text-[11px] text-muted-foreground">{application.symbol}</p></div></div></TableCell>
-              <TableCell className="whitespace-nowrap px-3 py-3 text-muted-foreground">{application.offerDate || "—"}</TableCell>
-              <TableCell className="whitespace-nowrap px-3 py-3 font-medium">₹{application.offerPrice || application.cutOffPrice}</TableCell>
-              <TableCell className="whitespace-nowrap px-3 py-3">{application.lotSize} shares</TableCell>
-              <TableCell className="px-3 py-3">{application.lots}</TableCell>
-              <TableCell className="whitespace-nowrap px-3 py-3 text-muted-foreground"><span className="inline-flex items-center gap-1.5"><CalendarDays className="size-3.5" aria-hidden="true" />{formatDate(application.applicationDate)}</span></TableCell>
-              <TableCell className="whitespace-nowrap px-3 py-3">{application.applicant}</TableCell>
-              <TableCell className="whitespace-nowrap px-3 py-3 text-right font-semibold">{formatCurrency(application.total)}</TableCell>
-              <TableCell className="px-3 py-3 text-right"><span className={cn("font-medium", application.status === "Tracked" ? "text-primary" : "text-muted-foreground")}>{application.status}</span></TableCell>
-              {onEdit && onDelete && <TableCell className="px-3 py-3"><RowActions itemLabel={application.company} onEdit={() => onEdit(application)} onDelete={() => onDelete(application)} /></TableCell>}
-            </TableRow>
-          ))}
-        </TableBody>
+        ))}
+      </TableBody>
     </Table>
   );
 }
