@@ -13,7 +13,7 @@ import { IPO_CATEGORY_LABELS, type IpoCategory, type PaginatedIpoResponse } from
 const PAGE_SIZE = 10;
 
 export default function AllIposPage() {
-  const [category, setCategory] = useState<IpoCategory>("active");
+  const [category, setCategory] = useState<IpoCategory>("open");
   const [page, setPage] = useState(1);
 
   const { data, error, isPending, isFetching } = useQuery({
@@ -27,9 +27,9 @@ export default function AllIposPage() {
   }
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-background">
+    <main className="my-20 overflow-x-hidden bg-background">
       <Navbar />
-      <div className="mx-auto w-full max-w-[1200px] px-5 py-8 sm:px-7 sm:py-12 lg:px-10">
+      <div className="max-w-[90rem] mx-auto w-full px-4 py-8 sm:px-6 lg:px-8">
         <header className="border-b border-border/70 pb-7">
           <p className="text-xs font-medium uppercase text-primary">IPO market</p>
           <h1 className="mt-2 text-2xl font-semibold tracking-normal sm:text-3xl">All IPOs</h1>
@@ -43,7 +43,7 @@ export default function AllIposPage() {
             <div>
               <h2 className="text-sm font-semibold">{IPO_CATEGORY_LABELS[category]} IPOs</h2>
               <p className="mt-1 text-xs text-muted-foreground">
-                {isPending ? "Loading records" : `${data?.total ?? 0} record${data?.total === 1 ? "" : "s"}`}
+                {isPending ? "Loading records" : `${data?.page.total_records ?? 0} record${data?.page.total_records === 1 ? "" : "s"}`}
               </p>
             </div>
             {isFetching && !isPending && <span className="text-xs text-muted-foreground">Refreshing...</span>}
@@ -56,16 +56,16 @@ export default function AllIposPage() {
             <MarketIpoList
               items={data?.items ?? []}
               category={category}
-              startIndex={((data?.page ?? page) - 1) * PAGE_SIZE}
+              startIndex={((data?.page.page_number ?? page) - 1) * PAGE_SIZE}
             />
           )}
 
           {!isPending && !error && data && (
             <>
               <p className="mt-5 text-center text-xs text-muted-foreground">
-                Page {data.page} of {data.totalPages}
+                Page {data.page.page_number} of {data.page.total_pages}
               </p>
-              <IpoPagination page={data.page} totalPages={data.totalPages} onChange={setPage} />
+              <IpoPagination page={data.page.page_number} totalPages={data.page.total_pages} onChange={setPage} />
             </>
           )}
         </section>
@@ -76,11 +76,11 @@ export default function AllIposPage() {
 
 async function fetchIpos(category: IpoCategory, page: number) {
   const params = new URLSearchParams({
-    category,
+    status: category,
     page: String(page),
     limit: String(PAGE_SIZE),
   });
-  const response = await fetch(`/api/market/ipos?${params.toString()}`);
+  const response = await fetch(`/api/upstox/ipos?${params.toString()}`);
   const body = await response.json().catch(() => ({})) as PaginatedIpoResponse & { error?: string };
 
   if (!response.ok) throw new Error(body.error || "Unable to load IPOs.");

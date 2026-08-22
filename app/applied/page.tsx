@@ -29,8 +29,8 @@ export default function AppliedPage() {
           </div>
         </div>
         {loading ? <ApplicationSummarySkeleton /> : <div className="mt-10 grid gap-4 sm:grid-cols-3">
-          <Summary label="Total applications" value={String(applications.length).padStart(2, "0")} />
           <Summary label="Total blocked" value={formatCurrency(grandTotal)} primary />
+          <Summary label="Total applications" value={String(applications.length).padStart(2, "0")} />
           <Summary label="Tracked lots" value={String(applications.reduce((sum, application) => sum + application.lots, 0)).padStart(2, "0")} />
         </div>
         }
@@ -52,5 +52,5 @@ export default function AppliedPage() {
 }
 
 function Summary({ label, value, primary }: { label: string; value: string; primary?: boolean }) {
-  return <div className={cn("border border-border/70 bg-card p-5 sm:p-6", primary && "bg-primary/10 border-primary/60 text-primary-foreground")}><p className={cn("text-sm", primary ? "text-primary-foreground/75" : "text-muted-foreground")}>{label}</p><p className="mt-3 text-2xl font-semibold">{value}</p></div>;
+  return <div className={cn("border border-border/5 bg-card text-foreground  p-5 sm:p-6", primary && "bg-transparent border-primary/60 text-foreground")}><p className={cn("text-sm", primary ? "text-foreground/75" : "text-muted-background")}>{label}</p><p className="mt-3 text-2xl font-semibold">{value}</p></div>;
 }
